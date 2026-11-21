@@ -1,0 +1,41 @@
+name: COMP120 - Set up release milestone
+on:
+  push:
+    paths:
+      - '.github/workflows/comp120-milestone.yml'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  milestone:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create milestone and link assignment issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const title = 'Yusuf_Al_Nader_v1.0 Release';
+            const due_on = '2026-11-28T04:59:00Z'; // Friday, Nov 27, 11:59 PM Toronto time
+            const milestones = await github.paginate(github.rest.issues.listMilestones, {
+              owner, repo, state: 'all', per_page: 100
+            });
+            let milestone = milestones.find(item => item.title === title);
+            if (!milestone) {
+              const created = await github.rest.issues.createMilestone({
+                owner, repo, title, due_on,
+                description: 'First working version of the task-list program for COMP120 Assignment 3.'
+              });
+              milestone = created.data;
+              core.info('Created milestone #' + milestone.number);
+            } else {
+              await github.rest.issues.updateMilestone({ owner, repo, milestone_number: milestone.number, due_on });
+              core.info('Updated existing milestone #' + milestone.number);
+            }
+            for (const issue_number of [1, 2, 3]) {
+              await github.rest.issues.update({ owner, repo, issue_number, milestone: milestone.number });
+              core.info('Attached issue #' + issue_number + ' to milestone #' + milestone.number);
+            }
