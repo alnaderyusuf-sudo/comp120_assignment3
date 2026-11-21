@@ -19,7 +19,7 @@ jobs:
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const title = 'Yusuf_Al_Nader_v1.0 Release';
-            const due_on = '2026-11-28T04:59:00Z'; // Friday, Nov 27, 11:59 PM Toronto time
+            const due_on = '2026-11-27T00:00:00Z'; // Friday, Nov 27 (GitHub milestone calendar date)
             const milestones = await github.paginate(github.rest.issues.listMilestones, {
               owner, repo, state: 'all', per_page: 100
             });
